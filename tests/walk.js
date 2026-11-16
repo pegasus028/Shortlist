@@ -42,7 +42,7 @@ async function overflow(p, label){ const w = await p.evaluate(() => document.doc
     const p = await phone(browser, n); phones[n] = p;
     await p.fill('#jName', n); await p.selectOption('#jPanel', P3.includes(n) ? '3' : '5'); await p.click('#jGo');
   }
-  await sleep(600);
+  await sleep(3500);
   await phones.Ploy.screenshot({ path: OUT + '/p1-lobby.png', fullPage: true });
   await overflow(phones.Ploy, 'lobby');
   check((await board.textContent('main')).includes('Mind'), 'board lists joined students');

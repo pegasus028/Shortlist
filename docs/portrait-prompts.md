@@ -1,5 +1,10 @@
 # Portrait prompts (Gemini image generation, "Nano Banana")
 
+Made 16 Nov 2026 in the Gemini app (Create image tool, 3:4), one new chat each, cropped to 4:5. Kong (c06) was
+regenerated once with "plain uniform mid-grey studio backdrop with no gradient, soft diffused frontal studio lighting with
+no harsh shadows, clean neat appearance … same studio look as a professional passport photo" because the first version
+looked harsher and less polished than the rest.
+
 One new chat per portrait. Everything that could signal quality is held constant (framing, clothing, backdrop, light,
 expression); only hair, face shape, glasses (two of ten) and skin tone vary. Save as `art/candidates/<id>.jpg`,
 600 × 750 px (4:5), JPEG ≤ 60 KB.
