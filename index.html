@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Shortlist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Instrument+Serif&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3efe6; --card:#fffdf8; --ink:#1d2433; --muted:#5d6676; --line:#ddd5c5; --soft:#ebe5d8;
+  --accent:#8a1c2b; --accent-ink:#fff; --gold:#a8771c; --gold-soft:#f6e7c4; --green:#2f6f4f; --green-soft:#dcefe3;
+  --flag:#c2410c; --flag-soft:#fde4d6; --blue:#2b5c8a; --blue-soft:#dde8f3; --shadow:0 1px 2px rgba(29,36,51,.08),0 6px 18px rgba(29,36,51,.06);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
+  --bg:#141821; --card:#1c2230; --ink:#ece7dc; --muted:#a3abba; --line:#313a4b; --soft:#232a3a;
+  --accent:#e0606f; --accent-ink:#141821; --gold:#e2b553; --gold-soft:#3a3120; --green:#6cc49a; --green-soft:#1d3329;
+  --flag:#f08a55; --flag-soft:#3b2519; --blue:#7fb0e0; --blue-soft:#1d2b3c; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark; }}
+:root[data-theme=dark]{
+  --bg:#141821; --card:#1c2230; --ink:#ece7dc; --muted:#a3abba; --line:#313a4b; --soft:#232a3a;
+  --accent:#e0606f; --accent-ink:#141821; --gold:#e2b553; --gold-soft:#3a3120; --green:#6cc49a; --green-soft:#1d3329;
+  --flag:#f08a55; --flag-soft:#3b2519; --blue:#7fb0e0; --blue-soft:#1d2b3c; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark; }
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Public Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;min-height:100vh}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 120px}
+.lab{font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:var(--muted)}
+.serif{font-family:'Instrument Serif',Georgia,serif;font-weight:400}
+h1.serif{font-size:42px;line-height:1}
+h2.serif{font-size:30px;line-height:1.05}
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top,0) 0 0}
+.bar .in{max-width:720px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-family:'Instrument Serif',serif;font-size:24px;line-height:1;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{display:block;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.clock{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;font-variant-numeric:tabular-nums;line-height:1}
+.clock.warn{color:var(--gold)} .clock.danger{color:var(--accent)}
+.iconbtn{border:1px solid var(--line);background:var(--card);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;font-size:18px}
+/* cards & buttons */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-top:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:13px 18px;font-weight:700;background:var(--accent);color:var(--accent-ink);min-height:48px}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.small{padding:8px 12px;min-height:38px;font-size:14px;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.block{width:100%}
+.field{display:block;margin-top:12px}
+.field input,.field select,textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px;background:var(--card);font-size:16px}
+textarea{min-height:92px;resize:vertical;line-height:1.45}
+.row{display:flex;gap:10px;align-items:center}
+.muted{color:var(--muted)}
+.note{background:var(--soft);border-radius:12px;padding:12px 14px;font-size:14px;margin-top:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;background:var(--soft)}
+.pill.gold{background:var(--gold-soft);color:var(--gold)} .pill.red{background:var(--flag-soft);color:var(--flag)}
+.pill.green{background:var(--green-soft);color:var(--green)} .pill.blue{background:var(--blue-soft);color:var(--blue)}
+ul.clean{list-style:none} ul.clean li{padding:6px 0;border-bottom:1px dashed var(--line)} ul.clean li:last-child{border:0}
+/* tabs */
+.tabs{display:flex;gap:6px;background:var(--soft);padding:4px;border-radius:12px;margin-top:14px}
+.tabs button{flex:1;border:0;background:transparent;border-radius:9px;padding:9px 6px;font-weight:700;font-size:15px;color:var(--muted)}
+.tabs button[aria-selected=true]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+/* applicant deck */
+.dots{display:flex;gap:6px;overflow-x:auto;padding:12px 2px 4px;scrollbar-width:none}
+.dots::-webkit-scrollbar{display:none}
+.dot{flex:0 0 auto;width:44px;text-align:center;border:0;background:none;padding:0}
+.dot .ph{width:40px;height:50px;border-radius:8px;border:2px solid transparent;display:grid;margin:0 auto}
+.dot span{display:block;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot[aria-current=true] .ph{border-color:var(--accent)}
+.dot[aria-current=true] span{color:var(--ink)}
+.dot.flagged span::after{content:' 🚩'}
+.ph{background:var(--soft);display:inline-grid;place-items:center;color:var(--muted);font-family:'Instrument Serif',serif;font-size:22px}
+.app-head{display:flex;gap:16px;align-items:flex-start}
+.portrait{width:112px;height:140px;border-radius:12px;flex:0 0 auto;border:1px solid var(--line);font-size:44px}
+.app-head .who{flex:1;min-width:0}
+.app-head .nm{font-family:'Instrument Serif',serif;font-size:38px;line-height:1}
+.qa{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.qa .q{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.qa .q .lab{color:var(--accent)}
+.qa .qtext{font-size:14px;color:var(--muted);margin-top:2px}
+.qa p.ans{margin-top:8px;font-size:17px;line-height:1.55}
+.listen{border:1.5px solid var(--blue);color:var(--blue);background:var(--blue-soft);border-radius:999px;padding:5px 12px;font-weight:700;font-size:14px;white-space:nowrap;min-height:34px}
+.listen.playing{background:var(--blue);color:var(--card)}
+.toolrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.flagbtn{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:10px 14px;font-weight:700;min-height:44px}
+.flagbtn[aria-pressed=true]{border-color:var(--flag);background:var(--flag-soft);color:var(--flag)}
+.rankpick{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:12px;padding:4px 4px 4px 12px;background:var(--card);min-height:44px}
+.rankpick select{border:0;background:var(--soft);border-radius:9px;padding:6px 8px;font-weight:700}
+.nav2{display:flex;justify-content:space-between;margin-top:16px}
+/* ranking list */
+.rlist{list-style:none;margin-top:8px}
+.ritem{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 10px;margin-top:8px}
+.ritem .rk{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:26px;width:30px;text-align:center;line-height:1}
+.ritem .ph{width:36px;height:45px;border-radius:7px;object-fit:cover;flex:0 0 auto;font-size:16px}
+.ritem .mid{flex:1;min-width:0}
+.ritem .mid b{display:block;font-size:17px;line-height:1.2}
+.ritem .mid small{font-size:13px;color:var(--muted)}
+.ritem.s1{border-color:var(--gold);background:linear-gradient(90deg,var(--gold-soft),var(--card) 70%)} .ritem.s1 .rk{color:var(--gold)}
+.ritem.s2 .rk,.ritem.s3 .rk{color:var(--accent)}
+.ritem.low{opacity:.85} .ritem.low .rk{color:var(--muted)}
+.mv{display:flex;flex-direction:column;gap:4px}
+.mv button{width:40px;height:30px;border:1px solid var(--line);background:var(--soft);border-radius:8px;font-size:14px;line-height:1}
+.mv button:disabled{opacity:.3}
+.cut{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted);font-size:12px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.cut::before,.cut::after{content:'';flex:1;border-top:1.5px dashed var(--line)}
+/* sticky action */
+.dock{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:18px 16px calc(14px + env(safe-area-inset-bottom,0));z-index:15}
+.dock .in{max-width:720px;margin:0 auto;display:flex;gap:10px;align-items:center}
+/* compare table */
+.tbl{width:100%;border-collapse:collapse;font-size:15px;margin-top:10px}
+.tbl th{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;padding:6px 4px;border-bottom:1.5px solid var(--line)}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:8px 4px;border-bottom:1px solid var(--line);text-align:center;font-variant-numeric:tabular-nums}
+.tbl td.c{display:flex;align-items:center;gap:8px;font-weight:600}
+.tbl td.c .ph{width:28px;height:35px;border-radius:6px;object-fit:cover;font-size:13px}
+.tbl tr.split td{background:var(--flag-soft)} .tbl tr.agree td{background:var(--green-soft)}
+.tscroll{overflow-x:auto;margin:0 -4px;padding:0 4px}
+.rkcell{display:inline-block;min-width:26px;padding:2px 4px;border-radius:7px;font-weight:700}
+.rkcell.top{background:var(--gold-soft);color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font-size:14px;text-align:left;line-height:1.3}
+.chip[aria-pressed=true]{border-color:var(--green);background:var(--green-soft);color:var(--green);font-weight:600}
+.wc{font-size:13px;font-weight:600;margin-top:4px}
+.wc.ok{color:var(--green)} .wc.no{color:var(--accent)}
+.member{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.member:last-child{border:0}
+.member input{width:22px;height:22px;accent-color:var(--accent)}
+.stamp{display:inline-block;border:2.5px solid currentColor;border-radius:8px;padding:2px 10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.12em;text-transform:uppercase;transform:rotate(-3deg)}
+.stamp.gold{color:var(--gold)} .stamp.red{color:var(--accent)} .stamp.green{color:var(--green)}
+.big{font-size:56px;font-family:'Barlow Condensed',sans-serif;font-weight:700;line-height:1}
+.center{text-align:center}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.sheet{position:fixed;inset:0;background:rgba(10,12,18,.5);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.sheet.show{display:flex}
+.sheet .box{background:var(--card);border-radius:20px 20px 0 0;max-width:720px;width:100%;max-height:86vh;overflow:auto;padding:20px 18px calc(24px + env(safe-area-inset-bottom,0))}
+.offline{background:var(--flag-soft);color:var(--flag);font-size:13px;font-weight:600;text-align:center;padding:6px}
+.nomcard{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.nomcard:last-child{border:0}
+.nomcard .ph{width:48px;height:60px;border-radius:8px;object-fit:cover;font-size:20px}
+.lb{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.lb .bar2{flex:1;height:10px;background:var(--soft);border-radius:6px;overflow:hidden}
+.lb .bar2 i{display:block;height:100%;background:var(--accent);border-radius:6px}
+@media (max-width:380px){ .app-head .nm{font-size:32px} .portrait{width:92px;height:115px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <div class="brand">The Shortlist<small id="sub">Horizon Scholars Programme</small></div>
+  <div class="clock" id="clock" aria-live="off"></div>
+  <button class="iconbtn" id="helpBtn" aria-label="What to look for">?</button>
+  <button class="iconbtn" id="themeBtn" aria-label="Switch light or dark">◐</button>
+</div><div id="offline" class="offline" hidden>Connection lost. Your work is saved on this phone; it will send when the connection returns.</div></div>
+<main class="wrap" id="app"></main>
+<div class="toast" id="toast" role="status"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Help"><div class="box" id="sheetBox"></div></div>
+<footer class="wrap muted" style="font-size:12px;padding-bottom:24px">Applicants are fictional. Portraits are AI-generated; voices are synthetic (Microsoft Sonia and Ryan).</footer>
+
+<script src="config.js?v=1"></script>
+<script src="data/content.js?v=1"></script>
+<script src="data/tts.js?v=1"></script>
+<script>
+'use strict';
+const SL = window.SL, C = SL.candidates, BYID = Object.fromEntries(C.map(c => [c.id, c]));
+const API = window.API_URL, KEY = 'sl.v1';
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const words = s => (String(s || '').trim().match(/\S+/g) || []).length;
+const pts = rank => 11 - rank;                       // 1st = 10 points ... 10th = 1 point
+const MIN_WORDS = 15;
+
+/* ---------- storage (wrapped, with in-memory fallback) ---------- */
+const mem = {};
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return mem[KEY] || {}; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { mem[KEY] = S; } }
+let S = load();
+function themeApply(t){ if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
+try { themeApply(localStorage.getItem('sl.theme')); } catch (e) {}
+$('#themeBtn').onclick = () => {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+    (!document.documentElement.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+  const t = dark ? 'light' : 'dark'; themeApply(t); try { localStorage.setItem('sl.theme', t); } catch (e) {}
+};
+
+/* ---------- helpers ---------- */
+function shuffle(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove('show'), 2400); }
+function img(c, cls){ return '<span class="ph ' + (cls || '') + '" role="img" aria-label="Portrait of applicant ' + esc(c.name) + '" style="position:relative;overflow:hidden">' + c.name[0] + '<img src="art/candidates/' + c.id + '.jpg" alt="" loading="lazy" onerror="this.remove()" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit"></span>'; }
+function tag(rank){ return rank === 1 ? 'Scholarship + place' : rank <= 3 ? 'Place' : rank >= 8 ? 'Bottom 3' : ''; }
+function apiReady(){ return API && API.indexOf('PASTE_') !== 0; }
+async function api(method, body, params){
+  if (!apiReady()) throw new Error('no-api');
+  let url = API + (params ? (API.indexOf('?') > -1 ? '&' : '?') + params : '');
+  const opt = { method, redirect: 'follow' };
+  if (method === 'POST') { opt.headers = { 'Content-Type': 'text/plain;charset=utf-8' }; opt.body = JSON.stringify(body); }
+  const r = await fetch(url, opt); return r.json();
+}
+
+/* ---------- read-aloud: recorded clip first, browser voice as fallback ---------- */
+function ttsNorm(t){ return String(t).replace(/\s+/g, ' ').trim(); }
+function ttsKey(t){ let h = 0x811c9dc5; t = ttsNorm(t); for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return ('0000000' + h.toString(16)).slice(-8); }
+const TTS = window.TTS || { dir: 'audio/', clips: {} };
+let audio = null, playToken = 0, playingBtn = null;
+function stopAudio(){ playToken++; if (audio) { try { audio.pause(); } catch (e) {} audio = null; } try { speechSynthesis.cancel(); } catch (e) {} if (playingBtn) { playingBtn.classList.remove('playing'); playingBtn.textContent = playingBtn.dataset.label; playingBtn = null; } }
+function pickVoice(g){
+  let vs = []; try { vs = speechSynthesis.getVoices(); } catch (e) {}
+  const gb = vs.filter(v => /en[-_]GB/i.test(v.lang));
+  if (g === 'M') return gb.find(v => /ryan|george|daniel|thomas|arthur|male/i.test(v.name)) || gb[0] || vs[0];
+  return gb.find(v => /sonia/i.test(v.name)) || gb.find(v => /libby|maisie|hollie|serena|kate|female/i.test(v.name)) || gb[0] || vs[0];
+}
+try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch (e) {}
+function playOne(c, i, token){
+  return new Promise(resolve => {
+    const text = c.answers[i], clip = TTS.clips && TTS.clips[c.id + '-' + (i + 1)];
+    const synth = () => { try { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = .9; const v = pickVoice(c.gender); if (v) u.voice = v; u.onend = u.onerror = resolve; speechSynthesis.speak(u); } catch (e) { resolve(); } };
+    if (token !== playToken) return resolve();
+    if (clip && clip === ttsKey(text)) {
+      audio = new Audio(TTS.dir + c.id + '-' + (i + 1) + '.mp3');
+      audio.onended = resolve;
+      audio.onerror = () => { if (token === playToken) synth(); else resolve(); };
+      audio.play().catch(e => { if (e && e.name === 'AbortError') return resolve(); if (token === playToken) synth(); else resolve(); });
+    } else synth();
+  });
+}
+async function listen(btn, c, list){
+  if (btn.classList.contains('playing')) { stopAudio(); return; }
+  stopAudio(); const token = playToken;
+  playingBtn = btn; btn.dataset.label = btn.dataset.label || btn.textContent; btn.classList.add('playing'); btn.textContent = '■ Stop';
+  for (const i of list) { if (token !== playToken) return; await playOne(c, i, token); }
+  if (token === playToken) stopAudio();
+}
+
+/* ---------- server state & clock ---------- */
+let ST = { phase: 'lobby', endsAt: 0, running: false, epoch: '1' }, skew = 0, online = true, pollH = null;
+const now = () => Date.now() + skew;
+function remaining(){ return ST.running && ST.endsAt ? Math.max(0, ST.endsAt - now()) : 0; }
+function live(ph){ return ST.phase === ph && ST.running && remaining() > 0; }
+function fmt(ms){ const s = Math.ceil(ms / 1000), m = Math.floor(s / 60); return m + ':' + String(s % 60).padStart(2, '0'); }
+function renderClock(){
+  const el = $('#clock');
+  if (S.practice) { el.textContent = ''; return; }
+  if (!ST.running || !ST.endsAt) { el.textContent = ''; el.className = 'clock'; return; }
+  const r = remaining(); el.textContent = fmt(r); el.className = 'clock' + (r <= 60000 ? ' danger' : r <= 120000 ? ' warn' : '');
+  if (r <= 0) onTimeUp();
+}
+setInterval(renderClock, 250);
+
+async function poll(){
+  if (S.practice || !S.name) return schedule();
+  try {
+    const r = await api('GET', null, 'action=state');
+    if (r && r.ok) {
+      skew = r.now - Date.now(); setOnline(true);
+      const prev = ST.phase, prevEpoch = S.epoch;
+      ST = r.state;
+      if (prevEpoch && String(ST.epoch) !== String(prevEpoch)) { resetLocal('Your teacher started a new game.'); return schedule(); }
+      if (!S.epoch) { S.epoch = String(ST.epoch); save(); }
+      onPhase(prev);
+      flushOutbox();
+    }
+  } catch (e) { setOnline(false); }
+  schedule();
+}
+function schedule(){ clearTimeout(pollH); const busy = live('r1') || live('r2') || live('r3'); pollH = setTimeout(poll, busy ? 12000 : 4000); }
+function setOnline(v){ online = v; $('#offline').hidden = v || !apiReady(); }
+
+/* phase change handling */
+let lastPhaseShown = null;
+function onPhase(prev){
+  if ((prev === 'r1' && ST.phase !== 'r1') || (ST.phase !== 'lobby' && ST.phase !== 'r1') || (ST.phase === 'r1' && ST.endsAt && !live('r1'))) autoSendR1();
+  if ((prev === 'r2' && ST.phase !== 'r2') || (ST.phase === 'r2' && ST.endsAt && !live('r2'))) autoSendPanel();
+  const shown = ST.phase + '|' + ST.running;
+  if (shown !== lastPhaseShown) { lastPhaseShown = shown; if (ST.phase === 'r2') loadPanel(); if (ST.phase === 'r3' || ST.phase === 'done') loadBoard(); render(); }
+}
+let timeUpDone = '';
+function onTimeUp(){
+  const k = ST.phase + ST.endsAt; if (timeUpDone === k) return; timeUpDone = k;
+  if (ST.phase === 'r1') { autoSendR1(); render(); }
+  if (ST.phase === 'r2') { autoSendPanel(); render(); }
+}
+
+/* ---------- outbox: every send is retried until the server says ok ---------- */
+function queue(body){ S.outbox = (S.outbox || []).filter(b => b.action !== body.action); S.outbox.push(body); save(); flushOutbox(); }
+let flushing = false;
+async function flushOutbox(){
+  if (flushing || !S.outbox || !S.outbox.length || S.practice) return; flushing = true;
+  try {
+    while (S.outbox.length) {
+      const b = S.outbox[0];
+      const r = await api('POST', b);
+      if (r && r.stale) { S.outbox = []; save(); break; }
+      if (r && r.ok === false && r.head) { S.outbox.shift(); save(); handleHeadClash(r.head); continue; }
+      S.outbox.shift(); save();
+      if (b.action === 'individual') { S.r1.sent = true; save(); render(); }
+      if (b.action === 'panel') { S.panelSent = true; save(); loadPanel(); }
+      setOnline(true);
+    }
+  } catch (e) { setOnline(false); setTimeout(() => { flushing = false; flushOutbox(); }, 4000 + Math.random() * 4000); return; }
+  flushing = false;
+}
+
+/* ---------- local state ---------- */
+function ensureR1(){
+  if (!S.r1) { S.r1 = { order: shuffle(C.map(c => c.id)), flags: [], moved: 0, sent: false }; S.deck = S.r1.order.slice(); S.cur = 0; save(); }
+}
+function resetLocal(msg){
+  S = { lastName: S.name || S.lastName, panel: S.panel }; save(); PANEL = null; BOARD = null; stopAudio(); lastPhaseShown = null; toast(msg || 'New game'); render();
+}
+
+/* ---------- views ---------- */
+let tab = 'apps';
+function render(){
+  stopAudio();
+  const el = $('#app');
+  if (!S.name && !S.practice) return el.innerHTML = viewJoin(), bindJoin();
+  if (S.practice) { ensureR1(); return el.innerHTML = viewR1(true), bindR1(true); }
+  $('#sub').textContent = S.name + ' · Panel ' + S.panel;
+  if (ST.phase === 'lobby') return el.innerHTML = viewLobby(), bindLobby();
+  if (ST.phase === 'r1') { ensureR1(); if (S.r1.sent && !live('r1')) return el.innerHTML = viewWait('Your ranking is in.', 'Round 2 starts when your teacher is ready. Sit with your panel.'), bindWait(); return el.innerHTML = viewR1(false), bindR1(false); }
+  if (ST.phase === 'r2') return el.innerHTML = viewR2(), bindR2();
+  return el.innerHTML = viewR3(), bindR3();
+}
+
+/* Join */
+function viewJoin(){
+  let opts = ''; for (let i = 1; i <= 10; i++) opts += '<option value="' + i + '">Panel ' + i + '</option>';
+  return '<div class="card" style="margin-top:22px"><div class="lab">Admissions panel game</div><h1 class="serif" style="margin-top:6px">The Shortlist</h1>' +
+    '<p style="margin-top:10px">' + esc(SL.meta.blurb) + '</p>' +
+    '<label class="field"><span class="lab">Your nickname</span><input id="jName" maxlength="20" autocomplete="nickname" placeholder="e.g. Mind" value="' + esc(S.lastName || '') + '"></label>' +
+    '<label class="field"><span class="lab">Your panel (group of three)</span><select id="jPanel">' + opts + '</select></label>' +
+    '<button class="btn block" id="jGo" style="margin-top:16px">Join the game</button>' +
+    '<button class="btn ghost block" id="jSolo" style="margin-top:10px">Solo practice (no class game)</button>' +
+    '<p class="note">🎧 Put your headphones on. Every answer can be read aloud.</p></div>';
+}
+function bindJoin(){
+  if (S.panel) $('#jPanel').value = S.panel;
+  $('#jGo').onclick = async () => {
+    const name = $('#jName').value.trim().replace(/\s+/g, ' ').slice(0, 20), panel = $('#jPanel').value;
+    if (!name) return toast('Type your nickname first');
+    if (!apiReady()) return toast('The class game is not connected yet. Try Solo practice.');
+    $('#jGo').disabled = true;
+    try {
+      const r = await api('POST', { action: 'register', name, panel });
+      if (!r.ok) throw new Error(r.error || 'error');
+      S = { name, panel, lastName: name, epoch: String(r.state.epoch) };
+      if (r.saved && r.saved.order) S.r1 = { order: r.saved.order, flags: r.saved.flags || [], moved: 1, sent: true }, S.deck = r.saved.order.slice(), S.cur = 0;
+      ST = r.state; skew = r.now - Date.now(); save(); lastPhaseShown = null; onPhase(ST.phase); render(); poll();
+    } catch (e) { $('#jGo').disabled = false; toast('Could not reach the class game. Check your connection.'); }
+  };
+  $('#jSolo').onclick = () => { S = { practice: true, lastName: S.lastName }; save(); render(); };
+}
+
+/* Lobby: briefing */
+function briefing(){
+  return '<div class="card"><div class="lab">Your briefing</div><h2 class="serif" style="margin-top:4px">You are the admissions panel</h2>' +
+    '<p style="margin-top:8px">' + esc(SL.meta.blurb) + '</p>' +
+    '<div class="lab" style="margin-top:14px">The three interview questions</div><ol style="padding-left:20px;margin-top:4px">' +
+    SL.questions.map(q => '<li><b>' + esc(q.label) + ':</b> ' + esc(q.text) + '</li>').join('') + '</ol>' +
+    '<div class="lab" style="margin-top:14px">Three rounds</div><ul class="clean" style="margin-top:2px">' +
+    '<li><b>Round 1 · Alone (10 min).</b> Read or listen to all ten applicants, then rank them 1–10.</li>' +
+    '<li><b>Round 2 · Panel (10 min).</b> Compare rankings with your two panel members, agree your nominations and write your reasons.</li>' +
+    '<li><b>Round 3 · Committee (10 min).</b> The whole class sees every panel’s choices on the board and agrees the final three.</li></ul>' +
+    '<div class="lab" style="margin-top:14px">Points</div><p>Your 1st choice gets the <b>scholarship and a place</b>, your 2nd and 3rd get <b>places</b>. Each rank gives the applicant points: 1st = 10, 2nd = 9 … 10th = 1. Everyone’s points make the class leaderboard.</p>' +
+    '<button class="btn ghost small" style="margin-top:12px" data-help>What makes a strong applicant?</button></div>';
+}
+function viewLobby(){
+  return '<div class="card"><div class="row"><span class="pill green">Joined</span><span class="muted">' + esc(S.name) + ' · Panel ' + esc(S.panel) + '</span></div>' +
+    '<p style="margin-top:10px"><b>Waiting for your teacher to start Round 1.</b> Read your briefing now.</p>' +
+    '<button class="btn ghost small" id="changeMe" style="margin-top:10px">Change name or panel</button></div>' + briefing();
+}
+function bindLobby(){ bindHelp(); $('#changeMe').onclick = () => { S.lastName = S.name; delete S.name; save(); render(); }; }
+function viewWait(t, sub){ return '<div class="card center" style="margin-top:30px"><div class="stamp green">Sent</div><h2 class="serif" style="margin-top:14px">' + esc(t) + '</h2><p class="muted" style="margin-top:6px">' + esc(sub) + '</p></div>' + myRankingCard(); }
+function bindWait(){ bindHelp(); }
+function myRankingCard(){
+  if (!S.r1) return '';
+  return '<div class="card"><div class="lab">Your ranking</div><ol style="padding-left:22px;margin-top:6px">' + S.r1.order.map((id, i) => '<li>' + esc(BYID[id].name) + (i === 0 ? ' — scholarship' : i < 3 ? ' — place' : '') + (S.r1.flags.includes(id) ? ' 🚩' : '') + '</li>').join('') + '</ol></div>';
+}
+
+/* Round 1 */
+function viewR1(practice){
+  const R = S.r1, cur = BYID[S.deck[S.cur || 0]];
+  const head = practice
+    ? '<div class="note" style="margin-top:14px"><b>Solo practice.</b> Nothing is sent to the class. <button class="btn ghost small" id="leaveSolo" style="margin-left:6px">Leave practice</button></div>'
+    : (R.sent ? '<div class="note" style="margin-top:14px">✅ Ranking sent. You can still change it and send again until the time is up.</div>' : '');
+  const tabs = '<div class="tabs" role="tablist"><button role="tab" aria-selected="' + (tab === 'apps') + '" data-tab="apps">Applicants</button><button role="tab" aria-selected="' + (tab === 'rank') + '" data-tab="rank">My ranking</button></div>';
+  let body = '';
+  if (tab === 'apps') {
+    const rank = R.order.indexOf(cur.id) + 1;
+    let sel = ''; for (let i = 1; i <= 10; i++) sel += '<option value="' + i + '"' + (i === rank ? ' selected' : '') + '>' + i + '</option>';
+    body = '<div class="dots" role="tablist" aria-label="Applicants">' + S.deck.map((id, i) => '<button class="dot' + (R.flags.includes(id) ? ' flagged' : '') + '" data-go="' + i + '" aria-current="' + (i === S.cur) + '">' + img(BYID[id]) + '<span>' + esc(BYID[id].name) + '</span></button>').join('') + '</div>' +
+      '<article class="card" aria-label="Applicant ' + esc(cur.name) + '"><div class="app-head">' + img(cur, 'portrait') +
+      '<div class="who"><div class="lab">Applicant ' + (S.cur + 1) + ' of 10</div><div class="nm">' + esc(cur.name) + '</div>' +
+      '<button class="listen" style="margin-top:12px" data-all>▶ Play all three</button></div></div>' +
+      SL.questions.map((q, i) => '<div class="qa"><div class="q"><span class="lab">' + (i + 1) + ' · ' + esc(q.label) + '</span><button class="listen" data-one="' + i + '">▶ Listen</button></div>' +
+        '<div class="qtext">' + esc(q.text) + '</div><p class="ans">“' + esc(cur.answers[i]) + '”</p></div>').join('') +
+      '<div class="toolrow"><button class="flagbtn" id="flag" aria-pressed="' + R.flags.includes(cur.id) + '">🚩 Red flag</button>' +
+      '<label class="rankpick"><span>My rank</span><select id="rankSel" aria-label="Rank for ' + esc(cur.name) + '">' + sel + '</select></label></div>' +
+      '<div class="nav2"><button class="btn ghost small" id="prev"' + (S.cur ? '' : ' disabled') + '>← Previous</button><button class="btn ghost small" id="next"' + (S.cur < 9 ? '' : ' disabled') + '>Next →</button></div></article>';
+  } else {
+    body = '<p class="muted" style="margin-top:12px;font-size:14px">Use ▲ ▼ to put the ten applicants in order. Tap a name to read the file again.</p>' + rankList(R.order, R.flags, 'r1');
+  }
+  if (!practice && !live('r1') && ST.endsAt) return '<div class="card center" style="margin-top:30px"><div class="stamp red">Time is up</div><p style="margin-top:12px">Your ranking ' + (R.sent ? 'has been sent.' : 'is being sent…') + '</p></div>' + myRankingCard();
+  const dock = practice ? '' : '<div class="dock"><div class="in"><button class="btn block" id="send">' + (R.sent ? 'Send my ranking again' : 'Send my ranking') + '</button></div></div>';
+  return head + tabs + body + dock;
+}
+function rankList(order, flags, scope){
+  let h = '<ol class="rlist">';
+  order.forEach((id, i) => {
+    const c = BYID[id], r = i + 1;
+    if (r === 4) h += '<li class="cut" aria-hidden="true">Not offered a place</li>';
+    if (r === 8) h += '<li class="cut" aria-hidden="true">Bottom 3</li>';
+    h += '<li class="ritem' + (r === 1 ? ' s1' : r <= 3 ? ' s' + r : r >= 8 ? ' low' : '') + '"><span class="rk">' + r + '</span>' + img(c) +
+      '<div class="mid"><b>' + (scope === 'r1' ? '<button style="border:0;background:none;padding:0;font-weight:700;text-align:left" data-open="' + id + '">' + esc(c.name) + '</button>' : esc(c.name)) + (flags && flags.includes(id) ? ' 🚩' : '') + '</b><small>' + pts(r) + ' pts' + (tag(r) ? ' · ' + tag(r) : '') + '</small></div>' +
+      '<div class="mv"><button data-up="' + i + '" data-scope="' + scope + '" aria-label="Move ' + esc(c.name) + ' up"' + (i ? '' : ' disabled') + '>▲</button><button data-dn="' + i + '" data-scope="' + scope + '" aria-label="Move ' + esc(c.name) + ' down"' + (i < 9 ? '' : ' disabled') + '>▼</button></div></li>';
+  });
+  return h + '</ol>';
+}
+function moveIn(arr, from, to){ const [x] = arr.splice(from, 1); arr.splice(to, 0, x); }
+function bindMoves(getArr, after){
+  document.querySelectorAll('[data-up],[data-dn]').forEach(b => b.onclick = () => {
+    const arr = getArr(b.dataset.scope); const i = +(b.dataset.up ?? b.dataset.dn), j = b.dataset.up != null ? i - 1 : i + 1;
+    if (j < 0 || j > 9) return; moveIn(arr, i, j); after(b.dataset.scope); render();
+    const sel = '[data-' + (b.dataset.up != null ? 'up' : 'dn') + '="' + j + '"][data-scope="' + b.dataset.scope + '"]';
+    const nb = document.querySelector(sel) || document.querySelector('[data-up="' + j + '"][data-scope="' + b.dataset.scope + '"]'); if (nb) nb.focus({ preventScroll: false });
+  });
+}
+function bindR1(practice){
+  const R = S.r1; bindHelp();
+  document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0, 0); });
+  document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { S.cur = +b.dataset.go; save(); render(); });
+  document.querySelectorAll('[data-open]').forEach(b => b.onclick = () => { S.cur = S.deck.indexOf(b.dataset.open); tab = 'apps'; save(); render(); window.scrollTo(0, 0); });
+  const cur = BYID[S.deck[S.cur || 0]];
+  if ($('#prev')) $('#prev').onclick = () => { S.cur--; save(); render(); window.scrollTo(0, 0); };
+  if ($('#next')) $('#next').onclick = () => { S.cur++; save(); render(); window.scrollTo(0, 0); };
+  if ($('#flag')) $('#flag').onclick = () => { const f = R.flags, k = f.indexOf(cur.id); k > -1 ? f.splice(k, 1) : f.push(cur.id); save(); render(); };
+  if ($('#rankSel')) $('#rankSel').onchange = e => { moveIn(R.order, R.order.indexOf(cur.id), +e.target.value - 1); R.moved++; save(); toast(cur.name + ' is now number ' + e.target.value); render(); };
+  document.querySelectorAll('[data-one]').forEach(b => b.onclick = () => listen(b, cur, [+b.dataset.one]));
+  const all = document.querySelector('[data-all]'); if (all) all.onclick = () => listen(all, cur, [0, 1, 2]);
+  bindMoves(() => R.order, () => { R.moved++; save(); });
+  if ($('#leaveSolo')) $('#leaveSolo').onclick = () => { S = { lastName: S.lastName }; save(); render(); };
+  if ($('#send')) $('#send').onclick = () => {
+    if (!R.moved && !confirm('You have not changed the order yet. Send it anyway?')) return;
+    sendR1(false); toast('Ranking sent'); render();
+  };
+}
+function sendR1(auto){ ensureR1(); S.r1.queued = true; save(); queue({ action: 'individual', name: S.name, panel: S.panel, order: S.r1.order, flags: S.r1.flags, auto, epoch: S.epoch }); }
+function autoSendR1(){ if (S.practice || !S.name || !S.r1 || S.r1.sent || S.r1.queued) return; sendR1(true); }
+
+/* Round 2: panel */
+let PANEL = null, panelH = null;
+async function loadPanel(){
+  if (S.practice || !S.name) return;
+  clearTimeout(panelH);
+  try { const r = await api('GET', null, 'action=panel&panel=' + encodeURIComponent(S.panel)); if (r && r.ok) { PANEL = r; if (ST.phase === 'r2' && !editingPanel()) render(); } } catch (e) {}
+  if (ST.phase === 'r2') panelH = setTimeout(loadPanel, 9000);
+}
+function editingPanel(){ const a = document.activeElement; return a && (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT' || a.tagName === 'SELECT'); }
+function membersData(){
+  const ms = (PANEL && PANEL.members) || [];
+  const me = ms.find(m => m.name.toLowerCase() === S.name.toLowerCase()) || { name: S.name, order: S.r1 && S.r1.order, flags: S.r1 && S.r1.flags };
+  if (!me.order && S.r1) { me.order = S.r1.order; me.flags = S.r1.flags; }
+  const others = ms.filter(m => m.name.toLowerCase() !== S.name.toLowerCase());
+  return { me, others };
+}
+function combined(list){
+  const sum = {}, best = {};
+  C.forEach(c => { sum[c.id] = 0; best[c.id] = 11; });
+  list.forEach(m => (m.order || []).forEach((id, i) => { sum[id] += pts(i + 1); best[id] = Math.min(best[id], i + 1); }));
+  return C.map(c => c.id).sort((a, b) => sum[b] - sum[a] || best[a] - best[b]).map(id => ({ id, sum: sum[id] }));
+}
+function viewR2(){
+  const { me, others } = membersData();
+  S.mates = (S.mates || []).filter(n => others.some(o => o.name === n)); save();
+  const chosen = others.filter(o => S.mates.includes(o.name));
+  const head = PANEL && PANEL.head, iAmHead = head && head.toLowerCase() === S.name.toLowerCase();
+  const sub = PANEL && PANEL.submission;
+  let h = '<div class="card"><div class="lab">Round 2 · Panel ' + esc(S.panel) + '</div><h2 class="serif" style="margin-top:4px">Who is on your panel?</h2>' +
+    '<p class="muted" style="font-size:14px;margin-top:4px">Tick your two panel members. Not in Panel ' + esc(S.panel) + '? <button class="btn ghost small" id="chPanel">Change panel</button></p>';
+  if (!others.length) h += '<p class="note">Nobody else has joined Panel ' + esc(S.panel) + ' yet. Ask your teammates to check their panel number.</p>';
+  else h += others.map(o => '<label class="member"><input type="checkbox" data-mate="' + esc(o.name) + '"' + (S.mates.includes(o.name) ? ' checked' : '') + '><span style="flex:1"><b>' + esc(o.name) + '</b></span>' + (o.order ? '<span class="pill green">ranking sent</span>' : '<span class="pill">no ranking</span>') + '</label>').join('');
+  h += '</div>';
+  // comparison
+  const cols = [{ name: 'You', order: me.order, flags: me.flags || [] }].concat(chosen.map(o => ({ name: o.name, order: o.order, flags: o.flags || [] })));
+  const withOrder = cols.filter(c => c.order);
+  if (withOrder.length >= 2) {
+    const comb = combined(withOrder);
+    const rows = comb.map(x => {
+      const ranks = withOrder.map(c => c.order.indexOf(x.id) + 1), spread = Math.max(...ranks) - Math.min(...ranks);
+      const fl = cols.reduce((a, c) => a + (c.flags.includes(x.id) ? 1 : 0), 0);
+      return { ...x, ranks: cols.map(c => c.order ? c.order.indexOf(x.id) + 1 : null), spread, fl };
+    });
+    const sortBy = S.cmpSort || 'split';
+    const shown = sortBy === 'split' ? rows.slice().sort((a, b) => b.spread - a.spread || b.sum - a.sum) : rows;
+    const agreeTop = rows.filter(r => r.ranks.every(k => k == null || k <= 3)).map(r => BYID[r.id].name);
+    const big = rows.slice().sort((a, b) => b.spread - a.spread)[0];
+    h += '<div class="card"><div class="lab">Compare and contrast</div><h2 class="serif" style="margin-top:4px">Where do you agree?</h2>' +
+      '<ul class="clean" style="margin-top:6px;font-size:15px"><li>🟢 <b>All of you put in your top 3:</b> ' + (agreeTop.length ? esc(agreeTop.join(', ')) : 'nobody — talk about your 1st choices first') + '</li>' +
+      '<li>🟠 <b>Biggest split:</b> ' + esc(BYID[big.id].name) + ' (ranks ' + big.ranks.filter(k => k).join(', ') + '). Each of you: give one piece of evidence from the answers.</li></ul>' +
+      '<div class="tabs" style="margin-top:12px"><button aria-selected="' + (sortBy === 'split') + '" data-sort="split">Biggest split first</button><button aria-selected="' + (sortBy === 'points') + '" data-sort="points">Combined points</button></div>' +
+      '<div class="tscroll"><table class="tbl"><thead><tr><th>Applicant</th>' + cols.map(c => '<th>' + esc(c.name) + '</th>').join('') + '<th>Points</th><th>🚩</th></tr></thead><tbody>' +
+      shown.map(r => '<tr class="' + (r.spread >= 5 ? 'split' : r.spread <= 1 ? 'agree' : '') + '"><td class="c">' + img(BYID[r.id]) + esc(BYID[r.id].name) + '</td>' +
+        r.ranks.map(k => '<td>' + (k == null ? '–' : '<span class="rkcell' + (k <= 3 ? ' top' : '') + '">' + k + '</span>') + '</td>').join('') +
+        '<td><b>' + r.sum + '</b></td><td>' + (r.fl || '') + '</td></tr>').join('') + '</tbody></table></div>' +
+      '<p class="muted" style="font-size:13px;margin-top:8px">Green rows: you agree (ranks within 1). Orange rows: ranks 5 or more apart — discuss these first.</p></div>';
+  } else {
+    h += '<div class="card"><div class="lab">Compare and contrast</div><p style="margin-top:6px">Tick your panel members to see your rankings side by side.</p>' + myRankingCard().replace('<div class="card">', '<div>') + '</div>';
+  }
+  // head of panel
+  h += '<div class="card"><div class="lab">Head of panel</div>';
+  if (sub) h += submissionView(sub);
+  if (!head) h += '<p style="margin-top:6px">Your panel needs one head. The head writes and submits the panel’s nominations.</p><button class="btn" id="claim" style="margin-top:10px">I’ll be head of panel</button>';
+  else if (!iAmHead) h += '<p style="margin-top:6px"><b>' + esc(head) + '</b> is head of panel and will submit. Help her decide and choose the words for your reasons.</p>';
+  h += '</div>';
+  if (iAmHead) h += headForm(withOrder.length ? combined(withOrder).map(x => x.id) : me.order);
+  return h;
+}
+function submissionView(sub){
+  return '<div class="note" style="background:var(--green-soft)"><b>✅ Submitted by ' + esc(sub.head) + '.</b> Panel: ' + esc((sub.members || []).join(', ')) + '</div>' +
+    sub.order.slice(0, 3).map((id, i) => '<div class="nomcard">' + img(BYID[id]) + '<div><span class="stamp ' + (i ? 'red' : 'gold') + '" style="font-size:13px">' + (i ? 'Place' : 'Scholarship') + '</span><b style="display:block;margin-top:4px">' + esc(BYID[id].name) + '</b><span class="muted" style="font-size:14px">' + esc(sub.reasons[['s', 'o2', 'o3'][i]] || '') + '</span></div></div>').join('');
+}
+function headForm(start){
+  if (!S.pform || S.pform.panel !== S.panel) S.pform = { panel: S.panel, order: start.slice(), reasons: { s: '', o2: '', o3: '' }, recs: {} };
+  const F = S.pform; save();
+  const lab = ['s', 'o2', 'o3'], title = ['Why does this applicant deserve the scholarship and a place?', 'Why does this applicant deserve a place?', 'Why does this applicant deserve a place?'];
+  let h = '<div class="card" id="pform"><div class="lab">You are head of panel</div><h2 class="serif" style="margin-top:4px">Your panel’s ranking</h2>' +
+    '<p class="muted" style="font-size:14px;margin-top:4px">It starts from your combined points. Move applicants until the whole panel agrees.</p>' + rankList(F.order, null, 'panel') + '</div>';
+  h += '<div class="card"><div class="lab">Reasons (at least ' + MIN_WORDS + ' words each)</div>';
+  F.order.slice(0, 3).forEach((id, i) => {
+    const w = words(F.reasons[lab[i]]);
+    h += '<div style="margin-top:14px"><div class="row"><span class="stamp ' + (i ? 'red' : 'gold') + '" style="font-size:13px">' + (i ? 'Place' : 'Scholarship') + '</span><b>' + esc(BYID[id].name) + '</b></div>' +
+      '<label class="field" style="margin-top:6px"><span class="muted" style="font-size:14px">' + title[i] + ' Use evidence from the answers.</span><textarea data-reason="' + lab[i] + '" maxlength="600">' + esc(F.reasons[lab[i]]) + '</textarea></label>' +
+      '<div class="wc ' + (w >= MIN_WORDS ? 'ok' : 'no') + '" data-wc="' + lab[i] + '">' + w + ' / ' + MIN_WORDS + ' words</div></div>';
+  });
+  h += '</div><div class="card"><div class="lab">Advice for your bottom 3</div><p class="muted" style="font-size:14px;margin-top:4px">Choose one or two pieces of advice for each applicant.</p>';
+  F.order.slice(7).forEach(id => {
+    const sel = F.recs[id] || [];
+    h += '<div style="margin-top:14px"><b>' + esc(BYID[id].name) + '</b><div class="chips">' + SL.recs.map(r => '<button class="chip" data-rec="' + id + '|' + r.id + '" aria-pressed="' + sel.includes(r.id) + '">' + esc(r.text) + '</button>').join('') + '</div></div>';
+  });
+  h += '</div><div class="dock"><div class="in"><button class="btn block" id="psend">Submit panel nominations</button></div></div>';
+  return h;
+}
+function panelReady(F){
+  const lab = ['s', 'o2', 'o3'];
+  if (lab.some(k => words(F.reasons[k]) < MIN_WORDS)) return 'Each reason needs at least ' + MIN_WORDS + ' words.';
+  if (F.order.slice(7).some(id => !(F.recs[id] || []).length)) return 'Choose advice for each of your bottom 3.';
+  return '';
+}
+function panelBody(auto){
+  const { others } = membersData(); const F = S.pform;
+  return { action: 'panel', panel: S.panel, head: S.name, members: [S.name].concat(others.filter(o => (S.mates || []).includes(o.name)).map(o => o.name)),
+    order: F.order, reasons: F.reasons, recs: F.recs, auto: !!auto, epoch: S.epoch };
+}
+function bindR2(){
+  bindHelp();
+  document.querySelectorAll('[data-mate]').forEach(b => b.onchange = () => {
+    const n = b.dataset.mate, m = S.mates || (S.mates = []);
+    if (b.checked) { if (m.length >= 3) { b.checked = false; return toast('A panel has three members (four at most).'); } m.push(n); } else m.splice(m.indexOf(n), 1);
+    save(); render();
+  });
+  if ($('#chPanel')) $('#chPanel').onclick = async () => {
+    const p = prompt('Your panel number (1–10)?', S.panel); if (!p || !/^(10|[1-9])$/.test(p.trim())) return;
+    S.panel = p.trim(); S.mates = []; delete S.pform; save(); try { await api('POST', { action: 'setPanel', name: S.name, panel: S.panel, epoch: S.epoch }); } catch (e) {}
+    PANEL = null; render(); loadPanel();
+  };
+  document.querySelectorAll('[data-sort]').forEach(b => b.onclick = () => { S.cmpSort = b.dataset.sort; save(); render(); });
+  if ($('#claim')) $('#claim').onclick = async () => {
+    $('#claim').disabled = true;
+    try { const r = await api('POST', { action: 'claimHead', panel: S.panel, name: S.name, epoch: S.epoch }); if (r.ok === false && r.head) handleHeadClash(r.head); else { PANEL = PANEL || {}; PANEL.head = S.name; render(); loadPanel(); } }
+    catch (e) { $('#claim').disabled = false; toast('No connection. Try again.'); }
+  };
+  if (S.pform) {
+    const F = S.pform;
+    bindMoves(() => F.order, () => save());
+    document.querySelectorAll('[data-reason]').forEach(t => t.oninput = () => {
+      F.reasons[t.dataset.reason] = t.value; save(); const w = words(t.value), el = document.querySelector('[data-wc="' + t.dataset.reason + '"]');
+      el.textContent = w + ' / ' + MIN_WORDS + ' words'; el.className = 'wc ' + (w >= MIN_WORDS ? 'ok' : 'no');
+    });
+    document.querySelectorAll('[data-rec]').forEach(b => b.onclick = () => {
+      const [id, rid] = b.dataset.rec.split('|'), a = F.recs[id] || (F.recs[id] = []), k = a.indexOf(rid);
+      if (k > -1) a.splice(k, 1); else { if (a.length >= 2) return toast('Two pieces of advice at most'); a.push(rid); }
+      save(); b.setAttribute('aria-pressed', a.includes(rid));
+    });
+    if ($('#psend')) $('#psend').onclick = () => {
+      const why = panelReady(F); if (why) return toast(why);
+      if ((S.mates || []).length < 2 && !confirm('You have not ticked two panel members. Submit anyway?')) return;
+      queue(panelBody(false)); toast('Panel nominations sent');
+    };
+  }
+}
+function handleHeadClash(head){ toast(head + ' is already head of panel'); if (PANEL) PANEL.head = head; delete S.pform; save(); render(); }
+function autoSendPanel(){
+  if (S.practice || !S.pform || !PANEL || !PANEL.head || PANEL.head.toLowerCase() !== S.name.toLowerCase() || S.panelSent) return;
+  if (PANEL.submission) return;
+  queue(panelBody(true));
+}
+
+/* Round 3: committee */
+let BOARD = null;
+async function loadBoard(){
+  if (S.practice || !S.name) return;
+  try { const r = await api('GET', null, 'action=board'); if (r && r.ok) { BOARD = r; render(); } } catch (e) {}
+  if (ST.phase === 'r3' || ST.phase === 'done') setTimeout(loadBoard, 15000);
+}
+function viewR3(){
+  let h = '<div class="card"><div class="lab">Round 3 · The committee</div><h2 class="serif" style="margin-top:4px">Look at the board</h2>' +
+    '<p style="margin-top:6px">Every panel’s choices are on the projector. Be ready to explain your panel’s scholarship choice — and to change your mind if another panel’s evidence is better.</p></div>';
+  const d = ST.decision;
+  if (d && d.offers && d.offers.length) {
+    h += '<div class="card"><div class="lab">The committee’s decision</div>' + d.offers.map(id => '<div class="nomcard">' + img(BYID[id]) + '<div><span class="stamp ' + (id === d.scholar ? 'gold' : 'red') + '" style="font-size:13px">' + (id === d.scholar ? 'Scholarship' : 'Place') + '</span><b style="display:block;margin-top:4px;font-size:18px">' + esc(BYID[id].name) + '</b></div></div>').join('') + '</div>';
+  }
+  if (BOARD) {
+    const lb = classPoints(BOARD.individuals || []), max = Math.max(1, ...lb.map(x => x.sum));
+    h += '<div class="card"><div class="lab">Class leaderboard · everyone’s Round 1 points</div>' +
+      lb.map((x, i) => '<div class="lb"><b style="width:22px">' + (i + 1) + '</b><span style="width:76px">' + esc(BYID[x.id].name) + '</span><span class="bar2"><i style="width:' + Math.round(x.sum / max * 100) + '%"></i></span><b style="width:36px;text-align:right">' + x.sum + '</b></div>').join('') + '</div>';
+  }
+  return h + myRankingCard();
+}
+function classPoints(list){ const sum = {}; C.forEach(c => sum[c.id] = 0); list.forEach(m => (m.order || []).forEach((id, i) => sum[id] += pts(i + 1))); return C.map(c => ({ id: c.id, sum: sum[c.id] })).sort((a, b) => b.sum - a.sum); }
+function bindR3(){ bindHelp(); }
+
+/* Help sheet */
+function bindHelp(){ document.querySelectorAll('[data-help]').forEach(b => b.onclick = openHelp); }
+function openHelp(){
+  $('#sheetBox').innerHTML = '<div class="row" style="justify-content:space-between"><h2 class="serif">What to look for</h2><button class="iconbtn" id="closeSheet" aria-label="Close">✕</button></div>' +
+    '<ul class="clean" style="margin-top:8px">' + SL.criteria.map(c => '<li><b>' + esc(c.name) + '.</b> ' + esc(c.look) + '</li>').join('') + '</ul>' +
+    '<div class="lab" style="margin-top:16px;color:var(--flag)">🚩 Red flags — warning signs</div><ul class="clean">' + SL.redFlags.map(f => '<li>' + esc(f) + '</li>').join('') + '</ul>' +
+    '<p class="note">In a real admissions round, one serious red flag can outweigh a strong file. Read every answer to the end.</p>' +
+    '<div class="lab" style="margin-top:16px">Points</div><p>1st = 10 points (scholarship and a place), 2nd = 9 and 3rd = 8 (places) … 10th = 1.</p>';
+  $('#sheet').classList.add('show'); $('#closeSheet').onclick = closeHelp; $('#closeSheet').focus();
+}
+function closeHelp(){ $('#sheet').classList.remove('show'); }
+$('#helpBtn').onclick = openHelp;
+$('#sheet').onclick = e => { if (e.target.id === 'sheet') closeHelp(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHelp(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopAudio(); else poll(); });
+
+/* boot */
+render();
+if (S.name && !S.practice) { poll(); if (ST.phase === 'r2') loadPanel(); }
+</script>
+</body>
+</html>
