@@ -1,30 +1,29 @@
-"""Record every applicant answer with Microsoft's Thai neural voices (edge-tts) and write data/tts.js.
+"""Record every applicant answer with Microsoft neural voices (edge-tts) and write data/tts.js.
 
     pip install edge-tts
     python tools/make-audio.py            # record missing or changed clips (text or voice changed)
     python tools/make-audio.py --force    # record everything again
 
-The voices are Thai voices reading English, so the applicants sound like Thai speakers of English.
-There is one Thai female voice (Premwadee) and one Thai male voice (Niwat); each applicant gets
-their own pitch and pace (CAST below) so the ten sound like ten different people.
+Each applicant has their own voice (CAST below): Singapore, Hong Kong, Philippine and British English.
 In the cloud workspace set TTS_CA_BUNDLE=/root/.ccr/ca-bundle.crt so edge-tts trusts the proxy.
 """
 import asyncio, json, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-F, M = 'th-TH-PremwadeeNeural', 'th-TH-NiwatNeural'
-# id: (voice, pitch, rate)
+# One real voice per applicant: Singapore, Hong Kong and Philippine English (clear, near-British pronunciation with an
+# Asian accent) plus two British voices per gender. The British voices are spread across strong and weak applicants
+# so that accent does not line up with quality.  id: (voice, pitch, rate)
 CAST = {
-    'c01': (F, '+0Hz',  '-6%'),    # Fern: mid, quick and direct
-    'c02': (M, '-4Hz',  '-14%'),   # Ton: slow, relaxed
-    'c03': (F, '+12Hz', '-4%'),    # Mint: brighter, brisk
-    'c04': (M, '+6Hz',  '+0%'),    # Win: confident, quicker
-    'c05': (F, '+22Hz', '-10%'),   # Ploy: high, warm
-    'c06': (M, '-14Hz', '-10%'),   # Kong: lower, steady
-    'c07': (M, '+14Hz', '-8%'),    # Beam: lighter
-    'c08': (F, '-6Hz',  '-2%'),    # Namwan: smooth, even
-    'c09': (M, '+0Hz',  '-16%'),   # Phum: quiet, careful
-    'c10': (F, '-14Hz', '-6%'),    # Praew: lower, assured
+    'c01': ('en-PH-RosaNeural',   '+0Hz', '-6%'),   # Fern
+    'c02': ('en-HK-SamNeural',    '+0Hz', '-8%'),   # Ton
+    'c03': ('en-SG-LunaNeural',   '+0Hz', '-6%'),   # Mint
+    'c04': ('en-GB-RyanNeural',   '+0Hz', '-6%'),   # Win
+    'c05': ('en-HK-YanNeural',    '+0Hz', '-8%'),   # Ploy
+    'c06': ('en-SG-WayneNeural',  '+0Hz', '-8%'),   # Kong
+    'c07': ('en-GB-ThomasNeural', '+0Hz', '-6%'),   # Beam
+    'c08': ('en-GB-LibbyNeural',  '+0Hz', '-6%'),   # Namwan
+    'c09': ('en-PH-JamesNeural',  '+0Hz', '-8%'),   # Phum
+    'c10': ('en-GB-SoniaNeural',  '+0Hz', '-6%'),   # Praew
 }
 
 if os.environ.get('TTS_CA_BUNDLE'):
