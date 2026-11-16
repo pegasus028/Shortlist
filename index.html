@@ -156,11 +156,11 @@ ul.clean{list-style:none} ul.clean li{padding:6px 0;border-bottom:1px dashed var
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" role="status"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Help"><div class="box" id="sheetBox"></div></div>
-<footer class="wrap muted" style="font-size:12px;padding-bottom:24px">Applicants are fictional. Portraits are AI-generated; voices are synthetic (Microsoft Sonia and Ryan).</footer>
+<footer class="wrap muted" style="font-size:12px;padding-bottom:24px">Applicants are fictional. Portraits are AI-generated; voices are synthetic Thai voices reading English (Microsoft Premwadee and Niwat).</footer>
 
 <script src="config.js?v=1"></script>
 <script src="data/content.js?v=1"></script>
-<script src="data/tts.js?v=1"></script>
+<script src="data/tts.js?v=2"></script>
 <script>
 'use strict';
 const SL = window.SL, C = SL.candidates, BYID = Object.fromEntries(C.map(c => [c.id, c]));
@@ -219,7 +219,7 @@ function playOne(c, i, token){
     const synth = () => { try { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = .9; const v = pickVoice(c.gender); if (v) u.voice = v; u.onend = u.onerror = resolve; speechSynthesis.speak(u); } catch (e) { resolve(); } };
     if (token !== playToken) return resolve();
     if (clip && clip === ttsKey(text)) {
-      audio = new Audio(TTS.dir + c.id + '-' + (i + 1) + '.mp3');
+      audio = new Audio(TTS.dir + c.id + '-' + (i + 1) + '.mp3?' + clip + (TTS.cast ? '-' + ttsKey(TTS.cast[c.id] || '') : ''));
       audio.onended = resolve;
       audio.onerror = () => { if (token === playToken) synth(); else resolve(); };
       audio.play().catch(e => { if (e && e.name === 'AbortError') return resolve(); if (token === playToken) synth(); else resolve(); });

@@ -36,7 +36,7 @@ There is no teacher PIN (same as Investigative Reporter): keep the board URL to 
 | `config.js` | `API_URL` (Apps Script `/exec`) and `APP_URL` |
 | `data/content.js` | Applicants, questions, criteria, red flags, advice options — all wording lives here |
 | `data/tts.js` | Generated list of recorded clips |
-| `audio/cNN-Q.mp3` | 30 recordings: Sonia (women), Ryan (men), British English, 90 % speed |
+| `audio/cNN-Q.mp3` | 30 recordings in Thai-accented English: Microsoft's Thai voices Premwadee (women) and Niwat (men), each applicant with their own pitch and pace (`CAST` in `tools/make-audio.py`) |
 | `art/candidates/cNN.jpg` | Portraits, 600 × 750 (letter tiles show until a portrait exists) |
 | `apps-script/Code.gs` | Backend (Script Properties, no Sheet). The private `Notes.gs` (designer's notes) lives only in the Apps Script project |
 | `tools/content-check.js` | Word bands (28–38 per answer, 90–110 per applicant), 5 F / 5 M, no key data in public files |
@@ -49,7 +49,7 @@ Change `data/content.js`, then:
 ```
 node tools/content-check.js
 pip install edge-tts
-python3 tools/make-audio.py          # re-records only changed answers
+python3 tools/make-audio.py          # re-records changed answers (text or an applicant's voice in CAST)
 ```
 
 Bump `?v=` on the script tags in `index.html` and `tools/board-src.html`, rebuild the board, commit. If the change alters
@@ -62,4 +62,4 @@ Apps Script project **The Shortlist backend** (Execute as Me, Anyone). Keys: `st
 `H:<panel>` (head), `P:<panel>` (panel nominations). Reset deletes everything and raises the epoch, which sends phones back
 to the join screen.
 
-Applicants are fictional. Portraits are AI-generated (Gemini); voices are Microsoft neural voices via edge-tts.
+Applicants are fictional. Portraits are AI-generated (Gemini); voices are Microsoft's Thai neural voices (Premwadee, Niwat) via edge-tts.

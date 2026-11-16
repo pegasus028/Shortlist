@@ -201,7 +201,7 @@ table.mx{border-collapse:separate;border-spacing:4px;width:100%}
 
 <script src="config.js?v=1"></script>
 <script src="data/content.js?v=1"></script>
-<script src="data/tts.js?v=1"></script>
+<script src="data/tts.js?v=2"></script>
 <script>
 'use strict';
 const API_URL = window.API_URL, POLL_MS = 3000;
@@ -388,7 +388,7 @@ async function playAns(btn, c, list){
   stopClip(); const tok = clipTok; btn.dataset.l = btn.textContent; btn.classList.add('playing'); btn.textContent = '■ Stop';
   for (const i of list) {
     if (tok !== clipTok) return;
-    await new Promise(res => { clip = new Audio((window.TTS ? TTS.dir : 'audio/') + c.id + '-' + (i + 1) + '.mp3'); clip.onended = clip.onerror = res; clip.play().catch(res); });
+    await new Promise(res => { clip = new Audio((window.TTS ? TTS.dir : 'audio/') + c.id + '-' + (i + 1) + '.mp3?v=' + ((window.TTS && TTS.cast && TTS.cast[c.id]) ? encodeURIComponent(TTS.cast[c.id]).length + (TTS.clips[c.id + '-' + (i + 1)] || '') : '1')); clip.onended = clip.onerror = res; clip.play().catch(res); });
   }
   if (tok === clipTok) stopClip();
 }
