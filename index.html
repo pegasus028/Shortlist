@@ -186,6 +186,8 @@ $('#themeBtn').onclick = () => {
 
 /* ---------- helpers ---------- */
 function shuffle(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+let armedKey = '', armedAt = 0;
+function armed(k){ const ok = armedKey === k && Date.now() - armedAt < 6000; armedKey = ok ? '' : k; armedAt = Date.now(); return ok; }
 function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove('show'), 2400); }
 function img(c, cls){ return '<span class="ph ' + (cls || '') + '" role="img" aria-label="Portrait of applicant ' + esc(c.name) + '" style="position:relative;overflow:hidden">' + c.name[0] + '<img src="art/candidates/' + c.id + '.jpg" alt="" loading="lazy" onerror="this.remove()" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit"></span>'; }
 function tag(rank){ return rank === 1 ? 'Scholarship + place' : rank <= 3 ? 'Place' : rank >= 8 ? 'Bottom 3' : ''; }
@@ -441,7 +443,7 @@ function bindR1(practice){
   bindMoves(() => R.order, () => { R.moved++; save(); });
   if ($('#leaveSolo')) $('#leaveSolo').onclick = () => { S = { lastName: S.lastName }; save(); render(); };
   if ($('#send')) $('#send').onclick = () => {
-    if (!R.moved && !confirm('You have not changed the order yet. Send it anyway?')) return;
+    if (!R.moved && !armed('send')) return toast('You have not changed the order yet. Tap Send again to send it anyway.');
     sendR1(false); toast('Ranking sent'); render();
   };
 }
@@ -477,7 +479,7 @@ function viewR2(){
   const head = PANEL && PANEL.head, iAmHead = head && head.toLowerCase() === S.name.toLowerCase();
   const sub = PANEL && PANEL.submission;
   let h = '<div class="card"><div class="lab">Round 2 · Panel ' + esc(S.panel) + '</div><h2 class="serif" style="margin-top:4px">Who is on your panel?</h2>' +
-    '<p class="muted" style="font-size:14px;margin-top:4px">Tick your two panel members. Not in Panel ' + esc(S.panel) + '? <button class="btn ghost small" id="chPanel">Change panel</button></p>';
+    '<p class="muted" style="font-size:14px;margin-top:4px">Tick your two panel members. Wrong panel? <select id="chPanel" aria-label="Change panel" style="border:1.5px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--card)">' + [1,2,3,4,5,6,7,8,9,10].map(n => '<option value="' + n + '"' + (String(n) === String(S.panel) ? ' selected' : '') + '>Panel ' + n + '</option>').join('') + '</select></p>';
   if (!others.length) h += '<p class="note">Nobody else has joined Panel ' + esc(S.panel) + ' yet. Ask your teammates to check their panel number.</p>';
   else h += others.map(o => '<label class="member"><input type="checkbox" data-mate="' + esc(o.name) + '"' + (S.mates.includes(o.name) ? ' checked' : '') + '><span style="flex:1"><b>' + esc(o.name) + '</b></span>' + (o.order ? '<span class="pill green">ranking sent</span>' : '<span class="pill">no ranking</span>') + '</label>').join('');
   h += '</div>';
@@ -559,9 +561,9 @@ function bindR2(){
     if (b.checked) { if (m.length >= 3) { b.checked = false; return toast('A panel has three members (four at most).'); } m.push(n); } else m.splice(m.indexOf(n), 1);
     save(); render();
   });
-  if ($('#chPanel')) $('#chPanel').onclick = async () => {
-    const p = prompt('Your panel number (1–10)?', S.panel); if (!p || !/^(10|[1-9])$/.test(p.trim())) return;
-    S.panel = p.trim(); S.mates = []; delete S.pform; save(); try { await api('POST', { action: 'setPanel', name: S.name, panel: S.panel, epoch: S.epoch }); } catch (e) {}
+  if ($('#chPanel')) $('#chPanel').onchange = async e => {
+    const p = e.target.value; if (!/^(10|[1-9])$/.test(p) || p === String(S.panel)) return;
+    S.panel = p; S.mates = []; delete S.pform; save(); try { await api('POST', { action: 'setPanel', name: S.name, panel: S.panel, epoch: S.epoch }); } catch (e) {}
     PANEL = null; render(); loadPanel();
   };
   document.querySelectorAll('[data-sort]').forEach(b => b.onclick = () => { S.cmpSort = b.dataset.sort; save(); render(); });
@@ -584,7 +586,7 @@ function bindR2(){
     });
     if ($('#psend')) $('#psend').onclick = () => {
       const why = panelReady(F); if (why) return toast(why);
-      if ((S.mates || []).length < 2 && !confirm('You have not ticked two panel members. Submit anyway?')) return;
+      if ((S.mates || []).length < 2 && !armed('psend')) return toast('You have not ticked two panel members. Tap Submit again to send anyway.');
       queue(panelBody(false)); toast('Panel nominations sent');
     };
   }

@@ -476,7 +476,9 @@ $('#r2Btn').onclick = () => setPhase('r2');
 $('#r3Btn').onclick = () => setPhase('r3');
 $('#stopBtn').onclick = async () => { try { await api('POST', { action: 'stop' }); await poll(); } catch (e) { alert('Could not reach the backend.'); } };
 $('#resetBtn').onclick = async () => {
-  if (!confirm('Reset the whole game: every student, ranking, panel and decision?')) return;
+  const btn = $('#resetBtn');
+  if (!btn.dataset.armed) { btn.dataset.armed = '1'; btn.textContent = 'Click again to reset everything'; setTimeout(() => { delete btn.dataset.armed; btn.textContent = 'Reset'; }, 5000); return; }
+  delete btn.dataset.armed; btn.textContent = 'Reset';
   const wipe = () => { hidePodium(); closeApp(); running = false; expirationMs = 0; pick = { offers: [], scholar: '' }; D = { state: { phase: 'lobby', endsAt: 0, running: false }, individuals: [], panels: [], heads: {}, notes: null }; lastSig = ''; view = 'live'; render(); renderClock(); };
   wipe(); $('#status').textContent = 'Resetting…';
   try { await api('POST', { action: 'reset' }); wipe(); await poll(); } catch (e) { alert('Could not reach the backend.'); }

@@ -141,7 +141,7 @@ async function overflow(p, label){ const w = await p.evaluate(() => document.doc
   // dark mode
   await phones.June.click('#themeBtn'); await sleep(200); await phones.June.screenshot({ path: OUT + '/p8-dark.png', fullPage: true });
   // reset
-  await board.click('#resetBtn'); await sleep(600);
+  await board.click('#resetBtn'); await board.click('#resetBtn'); await sleep(600);
   await phones.June.evaluate(() => poll()); await sleep(800);
   check(await phones.June.isVisible('#jName'), 'reset sends phones back to the join screen');
   check(errors.length === 0, 'no page errors' + (errors.length ? ': ' + errors.join(' | ') : ''));
