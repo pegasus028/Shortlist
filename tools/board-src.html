@@ -91,6 +91,20 @@ table.mx{border-collapse:separate;border-spacing:4px;width:100%}
 .ticks .t{display:flex;justify-content:space-between}
 .verdict{font-weight:700;font-size:15px}
 .verdict.agree{color:var(--green)} .verdict.split{color:var(--orange)}
+/* red flags report */
+.rfsum{display:flex;gap:28px;margin-top:10px;font-size:17px;color:var(--muted)}
+.rfsum b{font-family:'Barlow Condensed',sans-serif;font-size:30px;color:var(--paper);margin-right:2px}
+.rfrow{display:grid;grid-template-columns:52px 150px 200px 1fr;gap:14px;align-items:center;padding:9px 12px;border-radius:12px;border-bottom:1px dashed var(--line)}
+.rfrow .ph{width:52px;height:65px;border-radius:8px;font-size:24px;cursor:pointer}
+.rfrow .nm{font-family:'Instrument Serif',serif;font-size:30px;line-height:1;cursor:pointer}
+.rfrow .ct{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;color:var(--orange);line-height:1}
+.rfrow .ct small{display:block;font-size:14px;color:var(--muted);font-weight:600;letter-spacing:.04em;margin-top:3px}
+.rfrow .ct .bar{height:6px;background:rgba(239,233,221,.08);border-radius:3px;margin-top:6px;overflow:hidden}
+.rfrow .ct .bar i{display:block;height:100%;background:var(--orange)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border-radius:999px;padding:4px 12px;font-size:16px;font-weight:600;background:var(--panel2);border:1.5px solid var(--line);white-space:nowrap}
+.chip small{color:var(--muted);font-weight:500;margin-left:4px}
+.chip.hi{border-color:var(--gold);color:var(--gold)}
 /* applicant modal */
 .modal{position:fixed;inset:0;background:rgba(5,7,12,.82);display:none;align-items:center;justify-content:center;z-index:90;padding:30px}
 .modal.show{display:flex}
@@ -239,7 +253,7 @@ function stats(){
 function ordered(S, by){ return Object.values(S).sort((a, b) => by === 'ind' ? b.ip - a.ip || b.pp - a.pp : b.pp - a.pp || b.ip - a.ip); }
 
 /* ---------- tabs & views ---------- */
-const TABS = [['live', 'Live'], ['lb', 'Leaderboard'], ['mx', 'Nominations'], ['agr', 'Agreement'], ['apps', 'Applicants'], ['dec', 'Decision'], ['notes', 'Designer’s notes']];
+const TABS = [['live', 'Live'], ['lb', 'Leaderboard'], ['mx', 'Nominations'], ['agr', 'Agreement'], ['apps', 'Applicants'], ['rf', 'Red flags'], ['dec', 'Decision'], ['notes', 'Designer’s notes']];
 let view = 'live', lbBy = 'panel', autoTabbed = '';
 function renderTabs(){ $('#tabs').innerHTML = TABS.map(([k, t]) => '<button data-v="' + k + '" aria-selected="' + (view === k) + '">' + t + '</button>').join(''); document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { view = b.dataset.v; render(); }); }
 function renderPhasebar(){
@@ -251,7 +265,7 @@ function renderPhasebar(){
 function render(){
   renderTabs(); renderPhasebar();
   const keepScroll = $('#main').scrollTop;
-  const fn = { live: vLive, lb: vLb, mx: vMx, agr: vAgr, apps: vApps, dec: vDec, notes: vNotes }[view];
+  const fn = { live: vLive, lb: vLb, mx: vMx, agr: vAgr, apps: vApps, rf: vRf, dec: vDec, notes: vNotes }[view];
   $('#main').innerHTML = fn(); bindView(); $('#main').scrollTop = keepScroll;
 }
 function vLive(){
@@ -319,6 +333,27 @@ function vAgr(){
 function vApps(){
   return '<div class="lab">Click an applicant to read and play the answers, and to see every panel’s reasons</div><div class="pick" style="margin-top:14px">' + C.map(c => '<button data-c="' + c.id + '">' + face(c) + '<b>' + esc(c.name) + '</b></button>').join('') + '</div>' +
     '<div class="box" style="margin-top:16px"><div class="lab">The three questions</div><ol style="margin:8px 0 0 22px;font-size:20px;line-height:1.6">' + SL.questions.map(q => '<li><b>' + esc(q.label) + ':</b> ' + esc(q.text) + '</li>').join('') + '</ol></div>';
+}
+const ord = n => n + ({ 1: 'st', 2: 'nd', 3: 'rd' }[n] || 'th');
+function vRf(){
+  const ind = D.individuals.filter(m => m.order), { S, pan } = stats();
+  let h = '<div class="lab">Red flags · who flagged whom in Round 1</div><div style="color:var(--muted);font-size:15px;margin-top:2px">Each name is a student who tapped 🚩 on that applicant, with her panel and the rank she gave. Gold = she flagged the applicant but still ranked them in her top 3.</div>';
+  if (!ind.length) return h + '<div class="empty">No Round 1 rankings yet. Flags arrive with each student’s ranking.</div>';
+  const by = {}; C.forEach(c => by[c.id] = []);
+  ind.forEach(m => (m.flags || []).forEach(id => by[id] && by[id].push({ name: m.name, panel: m.panel, r: m.order.indexOf(id) + 1 })));
+  const total = Object.values(by).reduce((a, l) => a + l.length, 0), none = ind.filter(m => !(m.flags || []).length).map(m => m.name).sort((a, b) => a.localeCompare(b));
+  const rows = C.map(c => ({ c, l: by[c.id].sort((a, b) => a.r - b.r || a.name.localeCompare(b.name)) })).filter(x => x.l.length).sort((a, b) => b.l.length - a.l.length || C.indexOf(a.c) - C.indexOf(b.c));
+  const clean = C.filter(c => !by[c.id].length);
+  h += '<div class="rfsum">' + [[ind.length, 'rankings sent'], [total, 'red flags set'], [rows.length + ' / 10', 'applicants flagged'], [none.length + ' / ' + ind.length, 'students flagged nobody']].map(([v, t]) => '<span><b>' + v + '</b> ' + t + '</span>').join('') + '</div>';
+  h += '<div style="margin-top:10px">' + rows.map(({ c, l }) => {
+    const s = S[c.id], placed = s.sch + s.off;
+    return '<div class="rfrow">' + face(c).replace('<span class="ph', '<span data-c="' + c.id + '" class="ph') + '<div class="nm" data-c="' + c.id + '">' + esc(c.name) + '</div>' +
+      '<div class="ct">🚩 ' + l.length + '<small>of ' + ind.length + ' students' + (pan.length ? ' · placed by ' + placed + '/' + pan.length + ' panels' : '') + '</small><div class="bar"><i style="width:' + Math.round(l.length / ind.length * 100) + '%"></i></div></div>' +
+      '<div class="chips">' + l.map(f => '<span class="chip' + (f.r <= 3 ? ' hi' : '') + '">' + esc(f.name) + '<small>P' + esc(f.panel || '?') + ' · ranked ' + ord(f.r) + '</small></span>').join('') + '</div></div>';
+  }).join('') + '</div>';
+  if (clean.length) h += '<p style="margin-top:12px;font-size:17px"><span class="lab">Not flagged by anyone</span> ' + clean.map(c => esc(c.name)).join(' · ') + '</p>';
+  if (none.length) h += '<p style="margin-top:6px;font-size:17px"><span class="lab">Flagged nobody</span> ' + none.map(esc).join(' · ') + '</p>';
+  return h;
 }
 let pick = { offers: [], scholar: '' };
 function vDec(){

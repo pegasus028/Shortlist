@@ -65,7 +65,8 @@ async function overflow(p, label){ const w = await p.evaluate(() => document.doc
   await ploy.screenshot({ path: OUT + '/p3-ranking.png', fullPage: true });
   await overflow(ploy, 'ranking');
   for (const n of ['Ploy', 'Nam', 'Fern', 'Mind', 'June']) {
-    const p = phones[n]; if (n !== 'Ploy') { await p.click('[data-tab="rank"]'); for (let k = 0; k < 4; k++) await p.click('[data-up="' + (3 + Math.floor(Math.random() * 6)) + '"]'); }
+    const p = phones[n]; if (n === 'Nam' || n === 'Fern') await p.click('#flag');
+    if (n !== 'Ploy') { await p.click('[data-tab="rank"]'); for (let k = 0; k < 4; k++) await p.click('[data-up="' + (3 + Math.floor(Math.random() * 6)) + '"]'); }
     await p.click('#send'); await sleep(250);
   }
   await sleep(500);
@@ -119,6 +120,14 @@ async function overflow(p, label){ const w = await p.evaluate(() => document.doc
   check((await board.$$('.lbrow')).length === 10, 'leaderboard lists 10 applicants');
   await board.click('[data-v="mx"]'); await sleep(200); await board.screenshot({ path: OUT + '/b3-matrix.png' });
   await board.click('[data-v="agr"]'); await sleep(200); await board.screenshot({ path: OUT + '/b4-agreement.png' });
+  await board.click('[data-v="rf"]'); await sleep(200); await board.screenshot({ path: OUT + '/b4b-redflags.png' });
+  {
+    const want = await board.evaluate(() => { const m = {}; D.individuals.filter(x => x.order).forEach(x => (x.flags || []).forEach(id => (m[id] = m[id] || []).push(x.name))); return m; });
+    const got = await board.$$eval('.rfrow', rs => rs.map(r => ({ id: r.querySelector('.nm').dataset.c, names: [...r.querySelectorAll('.chip')].map(c => c.firstChild.textContent) })));
+    const ok = got.length === Object.keys(want).length && got.every(g => JSON.stringify(g.names.slice().sort()) === JSON.stringify((want[g.id] || []).slice().sort()));
+    check(ok && got.length >= 1 && Object.values(want).flat().length === 3, 'Red flags tab lists each flagging student under the right applicant (' + JSON.stringify(got) + ')');
+    check((await board.textContent('main')).includes('Flagged nobody'), 'Red flags tab names students who flagged nobody');
+  }
   await board.click('[data-v="lb"]'); await sleep(200);
   await board.click('.lbrow >> nth=0'); await sleep(300); await board.screenshot({ path: OUT + '/b5-applicant.png' });
   await board.click('#closeModal');
